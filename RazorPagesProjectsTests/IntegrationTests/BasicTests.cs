@@ -21,6 +21,10 @@ namespace RazorPagesProjectsTests.IntegrationTests
 
         [Theory]
         [InlineData("/")]
+        [InlineData("/Index")]
+        [InlineData("/About")]
+        [InlineData("/Privacy")]
+        [InlineData("/Contact")]
         public async Task Get_EndpointsReturnsSuccessAndCorrectContentType(string url)
         {
             // Arrange
