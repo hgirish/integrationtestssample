@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using RazorPagesProject;
+using RazorPagesProject.Data;
 using RazorPagesProject.Services;
 using RazorPagesProjectsTests.Helpers;
 using System;
@@ -58,8 +60,24 @@ namespace RazorPagesProjectsTests.IntegrationTests
             {
                 builder.ConfigureServices(services =>
                 {
-                    // Configure services
-                    //services.AddScoped<IQuoteService, TestQuoteService>();
+                    var serviceProvider = services.BuildServiceProvider();
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var scopedService = scope.ServiceProvider;
+                        var db = scopedService.GetRequiredService<ApplicationDbContext>();
+                        var logger = scopedService.GetRequiredService<ILogger<IndexPageTests>>();
+
+                        try
+                        {
+                            Utilities.ReinitializeDbForTests(db);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "An error occurred seeding " +
+                                   "the database with test messages. Error: {Message}",
+                                   ex.Message);
+                        }
+                    }
                 });
             }).CreateClient(new WebApplicationFactoryClientOptions
             {

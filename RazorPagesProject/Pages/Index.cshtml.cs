@@ -14,11 +14,13 @@ namespace RazorPagesProject.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IQuoteService _quoteService;
+        private readonly ApplicationDbContext _db;
 
-        public IndexModel(ILogger<IndexModel> logger, IQuoteService quoteService)
+        public IndexModel(ILogger<IndexModel> logger, IQuoteService quoteService, ApplicationDbContext db)
         {
             _logger = logger;
             _quoteService = quoteService;
+            _db = db;
         }
 
         [BindProperty]
@@ -32,25 +34,18 @@ namespace RazorPagesProject.Pages
         public IList<Message> Messages { get; private set; }
         public async Task OnGetAsync()
         {
-            Messages = new List<Message>
-            {
-                new Message
-                {
-                    Text = "Test Message",
-                    Id =1
-                }
-            };
+            Messages = await _db.GetMessagesAsync();
             Quote = await _quoteService.GenerateQuote();
         }
         public async Task<IActionResult> OnPostDeleteMessageAsync(int id)
         {
-            //await _db.DeleteMessageAsync(id);
+            await _db.DeleteMessageAsync(id);
 
             return RedirectToPage();
         }
-        public IActionResult OnPostDeleteAllMessagesAsync()
+        public async Task<IActionResult> OnPostDeleteAllMessagesAsync()
         {
-            //await _db.DeleteAllMessagesAsync();
+            await _db.DeleteAllMessagesAsync();
 
             return RedirectToPage();
         }
@@ -58,12 +53,12 @@ namespace RazorPagesProject.Pages
         {
             if (!ModelState.IsValid)
             {
-                // Messages = await _db.GetMessagesAsync();
-                Messages = new List<Message>();
+                 Messages = await _db.GetMessagesAsync();
+              
                 return Page();
             }
 
-           // await _db.AddMessageAsync(Message);
+            await _db.AddMessageAsync(Message);
 
             return RedirectToPage();
         }
@@ -71,15 +66,9 @@ namespace RazorPagesProject.Pages
 
         public async Task<IActionResult> OnPostAnalyzeMessagesAsync()
         {
-            //Messages = await _db.GetMessagesAsync();
-            Messages = new List<Message>
-            {
-                new Message
-                {
-                    Text = "Test Message",
-                    Id =1
-                }
-            };
+            Messages = await _db.GetMessagesAsync();
+        
+          
             if (Messages.Count == 0)
             {
                 MessageAnalysisResult = "There are no messages to analyze.";
