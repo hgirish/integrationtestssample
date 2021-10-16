@@ -46,5 +46,38 @@ namespace RazorPagesProjectsTests.IntegrationTests
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
             Assert.Equal("/", response.Headers.Location.OriginalString);
         }
+
+        [Fact]
+        public async Task Post_DeleteMessageHandler_ReturnsRedirectToRoot()
+        {
+            // Arange
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    // Configure services
+                });
+            }).CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
+
+            var defaultPage = await client.GetAsync("/");
+            var content = await HtmlHelpers.GetDocumentAsync(defaultPage);
+
+            // Act 
+            var response = await client.SendAsync(
+                  (IHtmlFormElement)content.QuerySelector("form[id='messages']"),
+                (IHtmlButtonElement)content.QuerySelector("form[id='messages']")
+                .QuerySelector("div[class='panel-body']")
+                .QuerySelector("button")
+                );
+
+            // Assert 
+            Assert.Equal(HttpStatusCode.OK, defaultPage.StatusCode);
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Equal("/", response.Headers.Location.OriginalString);
+
+        }
     }
 }
