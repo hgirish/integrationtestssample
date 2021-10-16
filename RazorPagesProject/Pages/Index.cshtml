@@ -1,10 +1,28 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Message System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+<h1>@ViewData["Title"]</h1>
+
+<form id="messages" method="post">
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <button id="deleteAllBtn" type="submit" asp-page-handler="DeleteAllMessages" class="pull-right btn btn-danger">Clear All</button>
+            <h3 class="panel-title" style="line-height:2.1">Messages</h3>
+        </div>
+        <div class="panel-body">
+            <ul>
+                @foreach (var message in Model.Messages)
+                {
+                    <li style="line-height:2.5">
+                        <button id="deleteBtn@(message.Id)" type="submit" class="btn btn-danger" style="margin-bottom:2px" asp-page-handler="DeleteMessage" asp-route-id="@message.Id">Delete</button>
+                        @message.Text
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</form>
