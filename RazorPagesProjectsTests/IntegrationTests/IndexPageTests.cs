@@ -79,5 +79,29 @@ namespace RazorPagesProjectsTests.IntegrationTests
             Assert.Equal("/", response.Headers.Location.OriginalString);
 
         }
+
+        [Fact]
+        public async Task Post_AddMessageHandler_ReturnsSuccess_WhenMissingMessageText()
+        {
+            // Arrange
+            var defaultPage = await _client.GetAsync("/");
+            var content = await HtmlHelpers.GetDocumentAsync(defaultPage);
+            var messageText = string.Empty;
+
+            // Act
+            var response = await _client.SendAsync(
+                (IHtmlFormElement)content.QuerySelector("form[id='addMessage']"),
+                (IHtmlButtonElement)content.QuerySelector("button[id='addMessageBtn']"),
+                new Dictionary<string, string>
+                {
+                    ["Message.Text"] = messageText
+                });
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, defaultPage.StatusCode);
+            // A ModelState failure returns to Page (200-OK) and doesn't redirect.
+            response.EnsureSuccessStatusCode();
+            Assert.Null(response.Headers.Location?.OriginalString);
+        }
     }
 }

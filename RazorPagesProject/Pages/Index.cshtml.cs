@@ -25,11 +25,37 @@ namespace RazorPagesProject.Pages
         public IList<Message> Messages { get; private set; }
         public void OnGet()
         {
-            Messages = new List<Message>();
+            Messages = new List<Message>
+            {
+                new Message
+                {
+                    Text = "Test Message",
+                    Id =1
+                }
+            };
+        }
+        public async Task<IActionResult> OnPostDeleteMessageAsync(int id)
+        {
+            //await _db.DeleteMessageAsync(id);
+
+            return RedirectToPage();
         }
         public IActionResult OnPostDeleteAllMessagesAsync()
         {
             //await _db.DeleteAllMessagesAsync();
+
+            return RedirectToPage();
+        }
+        public async Task<IActionResult> OnPostAddMessageAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                // Messages = await _db.GetMessagesAsync();
+                Messages = new List<Message>();
+                return Page();
+            }
+
+           // await _db.AddMessageAsync(Message);
 
             return RedirectToPage();
         }
